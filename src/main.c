@@ -22,7 +22,7 @@
 #define KHZ_8                                   8000
 #define KHZ_16                                  16000
 
-#define EI_MODEL_FREQUENCY                      KHZ_8
+#define EI_MODEL_FREQUENCY                      KHZ_16
 
 #define DETECTION_THRESHOLD                     0.8f
 #define EI_SIGNAL_LENGTH                        EI_MODEL_FREQUENCY
@@ -34,6 +34,9 @@
 #define SECONDS_IN_MINUTE                       60
 #define SECONDS_IN_HOUR                         (60 * SECONDS_IN_MINUTE)
 #define SECONDS_IN_DAY                          (24 * SECONDS_IN_HOUR)
+
+#define YEAR_OFFSET                             1900
+#define MONTH_OFFSET                            1
 
 /* Useful type constants */
 
@@ -81,7 +84,7 @@
 
 #define MAXIMUM_FILE_NAME_LENGTH                32
 
-#define MAXIMUM_WAV_FILE_SIZE                   (UINT32_MAX - 1)
+#define MAXIMUM_WAV_FILE_SIZE                   UINT32_MAX
 
 /* WAV header constant */
 
@@ -156,6 +159,15 @@
     AudioMoth_set ## led ## LED(true); \
     AudioMoth_delay(duration); \
     AudioMoth_set ## led ## LED(false); \
+}
+
+#define FLASH_REPEAT_LED(led, repeats, duration) { \
+    for (uint32_t i = 0; i < repeats; i += 1) { \
+        AudioMoth_set ## led ## LED(true); \
+        AudioMoth_delay(duration); \
+        AudioMoth_set ## led ## LED(false); \
+        AudioMoth_delay(duration); \
+    } \
 }
 
 #define FLASH_LED_AND_RETURN_ON_ERROR(fn) { \
@@ -298,7 +310,7 @@ static void setHeaderComment(wavHeader_t *wavHeader, CP_configSettings_t *config
 
     char *comment = wavHeader->icmt.comment;
 
-    comment += sprintf(comment, "Recorded at %02d:%02d:%02d %02d/%02d/%04d (UTC", time.tm_hour, time.tm_min, time.tm_sec, time.tm_mday, 1 + time.tm_mon, 1900 + time.tm_year);
+    comment += sprintf(comment, "Recorded at %02d:%02d:%02d %02d/%02d/%04d (UTC", time.tm_hour, time.tm_min, time.tm_sec, time.tm_mday, MONTH_OFFSET + time.tm_mon, YEAR_OFFSET + time.tm_year);
 
     int8_t timezoneHours = configSettings->timezoneHours;
 
@@ -487,7 +499,7 @@ static char *tempFileBuffer = (char*)primaryBuffer;
 
 static uint8_t firmwareVersion[AM_FIRMWARE_VERSION_LENGTH] = {1, 0, 0};
 
-static uint8_t firmwareDescription[AM_FIRMWARE_DESCRIPTION_LENGTH] = "AudioMoth-EdgeImpulse-RC8";
+static uint8_t firmwareDescription[AM_FIRMWARE_DESCRIPTION_LENGTH] = "AudioMoth-NatGeoDeploy-v1";
 
 /* Function prototypes */
 
@@ -543,7 +555,7 @@ static void writeGPSLogMessage(uint32_t currentTime, uint32_t currentMillisecond
 
     gmtime_r(&rawTime, &time);
 
-    uint32_t length = snprintf(tempFileBuffer, MAXIMUM_SAMPLES_IN_DMA_TRANSFER, "%02d/%02d/%04d %02d:%02d:%02d.%03ld UTC: %s\n", time.tm_mday, 1 + time.tm_mon, 1900 + time.tm_year, time.tm_hour, time.tm_min, time.tm_sec, currentMilliseconds, message);
+    uint32_t length = snprintf(tempFileBuffer, MAXIMUM_SAMPLES_IN_DMA_TRANSFER, "%02d/%02d/%04d %02d:%02d:%02d.%03ld UTC: %s\n", time.tm_mday, MONTH_OFFSET + time.tm_mon, YEAR_OFFSET + time.tm_year, time.tm_hour, time.tm_min, time.tm_sec, currentMilliseconds, message);
 
     AudioMoth_writeToFile(tempFileBuffer, length);
 
@@ -677,17 +689,11 @@ static bool readConfigurationFromFile() {
 
 /* Magenetic switch wait functions */
 
-static void startWaitingForMagneticSwith() {
+static void startWaitingForMagneticSwitch() {
 
     /* Flash LED to indicate start of waiting for magnetic switch */
 
-    for (uint32_t i = 0; i < MAGNETIC_SWITCH_CHANGE_FLASHES; i += 1) {
-
-        FLASH_LED(Red, SHORT_LED_FLASH_DURATION);
-
-        AudioMoth_delay(SHORT_LED_FLASH_DURATION);
-
-    }
+    FLASH_REPEAT_LED(Red, MAGNETIC_SWITCH_CHANGE_FLASHES, SHORT_LED_FLASH_DURATION);
 
     /* Cancel any scheduled recording */
 
@@ -701,17 +707,11 @@ static void startWaitingForMagneticSwith() {
 
 }
 
-static void stopWaitingForMagneticSwith(uint32_t *currentTime, uint32_t *currentMilliseconds) {
+static void stopWaitingForMagneticSwitch(uint32_t *currentTime, uint32_t *currentMilliseconds) {
 
     /* Flash LED to indicate end of waiting for magnetic switch */
 
-    for (uint32_t i = 0; i < MAGNETIC_SWITCH_CHANGE_FLASHES; i += 1) {
-
-        FLASH_LED(Green, SHORT_LED_FLASH_DURATION);
-
-        AudioMoth_delay(SHORT_LED_FLASH_DURATION);
-
-    }
+    FLASH_REPEAT_LED(Green, MAGNETIC_SWITCH_CHANGE_FLASHES, SHORT_LED_FLASH_DURATION);
 
     /* Schedule next recording */
 
@@ -1014,7 +1014,7 @@ int main(void) {
 
         /* If time setting was cancelled with the magnet switch then start waiting for the magnetic switch */
 
-        if (fixResult == GPS_CANCELLED_BY_MAGNETIC_SWITCH) startWaitingForMagneticSwith();
+        if (fixResult == GPS_CANCELLED_BY_MAGNETIC_SWITCH) startWaitingForMagneticSwitch();
 
         /* Power down */
 
@@ -1175,7 +1175,7 @@ int main(void) {
 
         if (recordingState == MAGNETIC_SWITCH) {
             
-            startWaitingForMagneticSwith();
+            startWaitingForMagneticSwitch();
 
             SAVE_SWITCH_POSITION_AND_POWER_DOWN(DEFAULT_WAIT_INTERVAL);
 
@@ -1219,7 +1219,7 @@ int main(void) {
 
         /* If time setting was cancelled with the magnet switch then start waiting for the magnetic switch */
 
-        if (fixResult == GPS_CANCELLED_BY_MAGNETIC_SWITCH) startWaitingForMagneticSwith();
+        if (fixResult == GPS_CANCELLED_BY_MAGNETIC_SWITCH) startWaitingForMagneticSwitch();
 
         /* Power down */
 
@@ -1263,11 +1263,11 @@ int main(void) {
 
             if (*waitingForMagneticSwitch) {
 
-                stopWaitingForMagneticSwith(&currentTime, &currentMilliseconds);
+                stopWaitingForMagneticSwitch(&currentTime, &currentMilliseconds);
 
             } else {
 
-                startWaitingForMagneticSwith();
+                startWaitingForMagneticSwitch();
 
             }
             
@@ -1351,7 +1351,7 @@ inline void AudioMoth_timezoneRequested(int8_t *timezoneHours, int8_t *timezoneM
 
 /* GPS time handlers */
 
-void GPS_handleSetTime(uint32_t time, uint32_t milliseconds, int64_t timeDifference, uint32_t measuredClockFrequency) {
+inline void GPS_handleSetTime(uint32_t time, uint32_t milliseconds, int64_t timeDifference, uint32_t measuredClockFrequency) {
 
     /* Re-use secondary DMA buffer to save space */ 
 
@@ -1407,7 +1407,7 @@ void GPS_handleSetTime(uint32_t time, uint32_t milliseconds, int64_t timeDiffere
 
 }
 
-void GPS_handleGetTime(uint32_t *time, uint32_t *milliseconds) {
+inline void GPS_handleGetTime(uint32_t *time, uint32_t *milliseconds) {
 
     AudioMoth_getTime(time, milliseconds);
 
@@ -1415,7 +1415,7 @@ void GPS_handleGetTime(uint32_t *time, uint32_t *milliseconds) {
 
 /* GPS interrupt handlers */
 
-void GPS_handleTickEvent() {
+inline void GPS_handleTickEvent() {
 
     if (gpsTickEventCount == 0) {
 
@@ -1445,7 +1445,7 @@ void GPS_handleTickEvent() {
 
 }
 
-void GPS_handlePPSEvent(uint32_t time, uint32_t milliseconds) {
+inline void GPS_handlePPSEvent(uint32_t time, uint32_t milliseconds) {
 
     writeGPSLogMessage(time, milliseconds, "Received pulse per second signal.");
 
@@ -1453,7 +1453,7 @@ void GPS_handlePPSEvent(uint32_t time, uint32_t milliseconds) {
 
 }
 
-void GPS_handleFixEvent(uint32_t time, uint32_t milliseconds, GPS_fixTime_t *fixTime, GPS_fixPosition_t *fixPosition, char *message) {
+inline void GPS_handleFixEvent(uint32_t time, uint32_t milliseconds, GPS_fixTime_t *fixTime, GPS_fixPosition_t *fixPosition, char *message) {
 
     /* Use the secondary DMA buffer to save RAM */
 
@@ -1467,7 +1467,7 @@ void GPS_handleFixEvent(uint32_t time, uint32_t milliseconds, GPS_fixTime_t *fix
 
 }
 
-void GPS_handleMessageEvent(uint32_t time, uint32_t milliseconds, char *message) {
+inline void GPS_handleMessageEvent(uint32_t time, uint32_t milliseconds, char *message) {
 
     if (!gpsFirstMessageReceived) {
 
@@ -1593,7 +1593,7 @@ static void generateFolderAndFilename(char *foldername, char *filename, uint32_t
 
     gmtime_r(&rawTime, &time);
 
-    sprintf(foldername, "%04d%02d%02d", 1900 + time.tm_year, 1 + time.tm_mon, time.tm_mday);
+    sprintf(foldername, "%04d%02d%02d", YEAR_OFFSET + time.tm_year, MONTH_OFFSET + time.tm_mon, time.tm_mday);
 
     uint32_t length = sprintf(filename, "%s/%02d%02d%02d", foldername, time.tm_hour, time.tm_min, time.tm_sec);
 
