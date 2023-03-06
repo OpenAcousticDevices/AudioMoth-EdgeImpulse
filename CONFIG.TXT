@@ -1,0 +1,18 @@
+Any text here is ignored.
+
+{
+    enableLED: 1,
+    enableMagneticSwitch: 0,
+    enableTimeSettingFromGPS: 0,
+    enableEdgeImpulseModel: 1,
+    batteryLevelDisplayType: 1,
+    recordingPeriods: [
+        {startTime: "00:00", stopTime: "24:00"}
+    ],
+    sleepRecordCycle: {
+        sleepDuration: 30,
+        recordDuration: 30
+    }
+}
+
+Text here is also ignored.
