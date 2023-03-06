@@ -54,9 +54,11 @@ build/audiomoth_edgeimpulse.bin
 build/audiomoth_edgeimpulse.hex
 build/audiomoth_edgeimpulse.lst
 build/audiomoth_edgeimpulse.map
+build/*.s
 build/objects/*.d
 build/objects/*.o
 build/objects/ff.o
 build/objects/ffunicode.o
 build/objects/main.d
 build/objects/main.o
+

@@ -9,9 +9,15 @@ Clone the contents of [AudioMoth-Project](https://github.com/OpenAcousticDevices
 
 Replace the ```src/main.c``` from AudioMoth-Project with the ```src/main.c``` from this repository. Put all the remaining ```src/*.c``` files and all the ```src/*.h``` files from this repository into the ```/src/``` and ```/inc/``` folders of the AudioMoth-Project repository. Copy the ```edgeimpulse/``` and ```dsplib/``` folder (including its contents and subfolders) from this repository into the AudioMoth-Project repository. Replace the `build/Makefile` from AudioMoth-Project with the `build/Makefile` from this repository. 
 
+In `fatfs/inc/ffconf.h` make the following changes
+
+- Disable support for long file names: ```#define FF_USE_LFN		0```
+- Disable support for exFAT filesystem: ```#define FF_FS_EXFAT		0```
+- Enable tiny buffer configuration: ```#define FF_FS_TINY		1```
+
 The SD card used with AudioMoth Edge Impulse needs to have a `CONFIG.TXT`. An example CONFIG.TXT file is included in this repo and can be customized. 
 
-#### NOTE ####
+#### !! NOTE ####
 **Currently AudioMoth with Edge Impulse only supports FAT32-formatted SD cards**
 
 ## Steps to Build Firmware with different Edge Impulse models ##
