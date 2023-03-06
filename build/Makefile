@@ -16,7 +16,7 @@ TOOLPATH = $(TOOLCHAIN_PATH)/$(TOOLCHAIN_VERSION)/bin/
 
 # Path to Edge Impulse Model to use 
 
-EI_MODELPATH = -- INSERT PATH TO EDGE IMPULSE MODEL HERE (e.g. /Users/user/Desktop/Model/) --
+EI_MODELPATH = -- INSERT PATH TO EDGE IMPULSE MODEL HERE (e.g. /Users/user/Desktop/Model) --
 
 # Set the name of the output files
 

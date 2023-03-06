@@ -7,7 +7,7 @@ For more details, visit [AudioMoth Labs](https://www.openacousticdevices.info/la
 
 Clone the contents of [AudioMoth-Project](https://github.com/OpenAcousticDevices/AudioMoth-Project).
 
-Replace the ```src/main.c``` from AudioMoth-Project with the ```src/main.c``` from this repository. Put all the remaining ```src/*.c``` files and all the ```src/*.h``` files from this repository into the ```/src/``` and ```/inc/``` folders of the AudioMoth-Project repository. Copy the ```edgeimpulse/``` folder (including its contents and subfolders) from this repository into the AudioMoth-Project repository. Replace the `build/Makefile` from AudioMoth-Project with the `build/Makefile` from this repository. 
+Replace the ```src/main.c``` from AudioMoth-Project with the ```src/main.c``` from this repository. Put all the remaining ```src/*.c``` files and all the ```src/*.h``` files from this repository into the ```/src/``` and ```/inc/``` folders of the AudioMoth-Project repository. Copy the ```edgeimpulse/``` and ```dsplib/``` folder (including its contents and subfolders) from this repository into the AudioMoth-Project repository. Replace the `build/Makefile` from AudioMoth-Project with the `build/Makefile` from this repository. 
 
 The SD card used with AudioMoth Edge Impulse needs to have a `CONFIG.TXT`. An example CONFIG.TXT file is included in this repo and can be customized. 
 
