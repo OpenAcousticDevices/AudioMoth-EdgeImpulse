@@ -1,5 +1,5 @@
 # AudioMoth-Edge Impulse
-A modified version of the [AudioMoth standard firmware](https://github.com/OpenAcousticDevices/AudioMoth-Project). This software performs live classification of samples using a neural network from Edge Impulse and saves audio clips containing a specific sound.
+A modified version of the [AudioMoth standard firmware](https://github.com/OpenAcousticDevices/AudioMoth-Project). This software performs live classification of samples using a neural network from [Edge Impulse](https://edgeimpulse.com/) and saves audio clips containing a specific sound.
 
 For more details, visit [AudioMoth Labs](https://www.openacousticdevices.info/labs).
 
@@ -31,13 +31,15 @@ The SD card used with AudioMoth Edge Impulse needs to have a `CONFIG.TXT`. An ex
 
 See [AudioMoth LED Guide](https://www.openacousticdevices.info/led-guide) for the meaning of the LED lights and troubleshooting. 
 
-#### 3 Quick Flashes of Red & Green LED ####
+#### Error: 3 Quick Flashes of Red & Green LED ####
 
 1. Check that the Edge Impulse model sample rate (8 kHz or 16 kHz) matches the AudioMoth sample rate setting (`firmware/src/main.c` set the `#define EI_MODEL_FREQUENCY`)
 2. If this problem still persists, the Edge Impulse model uses too much RAM (likely during the MFCC block). Reduce the parameters used in MFCC and try the updated model. Models with RAM usage > 20 kB are likely not to work.
 
 ### License ###
 
-Copyright 2023 [Open Acoustic Devices](http://www.openacousticdevices.info/).
+The `dsplib` source files are from the [ARM CMSIS-DSP embedded compute library](https://github.com/ARM-software/CMSIS-DSP) under the [Apache 2.0 license](https://github.com/ARM-software/CMSIS-DSP/blob/main/LICENSE.txt). 
 
-[MIT license](http://www.openacousticdevices.info/license).
+The rest of the firmware is Copyright 2023 [Open Acoustic Devices](http://www.openacousticdevices.info/) under the [MIT license](http://www.openacousticdevices.info/license).
+
+
