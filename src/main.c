@@ -833,7 +833,7 @@ int main(void) {
 
         if (fileSystemEnabled) {
             
-            bool success = AudioMoth_openFileToRead("CONFIG.TXT");
+            bool success = AudioMoth_openFileToRead("SETTINGS.TXT");
 
             if (success) {
                 
