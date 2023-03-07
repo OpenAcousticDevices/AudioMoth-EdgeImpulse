@@ -15,7 +15,7 @@ In `fatfs/inc/ffconf.h` make the following changes
 - Disable support for exFAT filesystem: ```#define FF_FS_EXFAT		0```
 - Enable tiny buffer configuration: ```#define FF_FS_TINY		1```
 
-The SD card used with AudioMoth Edge Impulse needs to have a `CONFIG.TXT`. An example CONFIG.TXT file is included in this repo and can be customized. 
+The SD card used with AudioMoth Edge Impulse needs to have a `SETTINGS.TXT`. An example SETTINGS.TXT file is included in this repo and can be customized. 
 
 #### !! NOTE ####
 **Currently AudioMoth with Edge Impulse only supports FAT32-formatted SD cards**

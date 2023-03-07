@@ -24,7 +24,7 @@ FILENAME = audiomoth_edgeimpulse
 
 # Edge Impulse Header Files 
 
-EI_INC = $(EI_MODELPATH) $(EI_MODELPATH)/edge-impulse-sdk $(EI_MODELPATH)/edge-impulse-sdk/classifier $(EI_MODELPATH)/edge-impulse-sdk/third_party $(EI_MODELPATH)/edge-impulse-sdk/third_party/flatbuffers/include $(EI_MODELPATH)/edge-impulse-sdk/third_party/ruy $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/NN/Include $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/DSP/Include $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/Core/Include $(EI_MODELPATH)/edge-impulse-sdk/DSP/PrivateInclude $(EI_MODELPATH)/edge-impulse-sdk/third_party/gemmlowp $(EI_MODELPATH)/edge-impulse-sdk/porting $(EI_MODELPATH)/tflite-model
+EI_INC = ../cmsis $(EI_MODELPATH) $(EI_MODELPATH)/edge-impulse-sdk $(EI_MODELPATH)/edge-impulse-sdk/classifier $(EI_MODELPATH)/edge-impulse-sdk/third_party $(EI_MODELPATH)/edge-impulse-sdk/third_party/flatbuffers/include $(EI_MODELPATH)/edge-impulse-sdk/third_party/ruy $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/NN/Include $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/DSP/Include $(EI_MODELPATH)/edge-impulse-sdk/CMSIS/Core/Include $(EI_MODELPATH)/edge-impulse-sdk/DSP/PrivateInclude $(EI_MODELPATH)/edge-impulse-sdk/third_party/gemmlowp $(EI_MODELPATH)/edge-impulse-sdk/porting $(EI_MODELPATH)/tflite-model
 
 # Edge Impulse Source Files
 
@@ -36,7 +36,7 @@ SRC = ../device/src ../emlib/src ../emusb/src ../drivers/src ../fatfs/src ../gps
 
 # Header files for this project (C and C++)
 
-INC = ../cmsis ../device/inc ../emlib/inc ../emusb/inc ../drivers/inc ../fatfs/inc ../gps/inc ../inc ../edgeimpulse/inc $(EI_INC)
+INC = ../device/inc ../emlib/inc ../emusb/inc ../drivers/inc ../fatfs/inc ../gps/inc ../inc ../edgeimpulse/inc
 
 # This is the location of the resulting object files
 
@@ -55,6 +55,8 @@ OPTLEVEL = -O3
 VPATH = $(SRC)
 
 IFLAGS = $(foreach d, $(INC), -I$d)
+
+ISYSTEMFLAGS = $(foreach d, $(EI_INC), -isystem $d)
 
 _CPPSRC = $(notdir $(foreach d, $(SRC), $(wildcard $d/*.cpp)))
 _CPPSRC2 = $(notdir $(foreach d, $(SRC), $(wildcard $d/*.cc)))
@@ -95,22 +97,22 @@ DFLAGS = -MMD
 $(OBJPATH)%.o: %.cpp
 	@mkdir -p $(OBJPATH)
 	@echo 'Building C++' $@
-	@$(CXX) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -fpermissive -std=gnu++0x -c -o "$@" "$<" $(IFLAGS)
+	@$(CXX) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -fpermissive -std=gnu++0x -c -o "$@" "$<" $(IFLAGS) $(ISYSTEMFLAGS)
 
 $(OBJPATH)%.o: %.cc
 	@mkdir -p $(OBJPATH)
 	@echo 'Building C++' $@
-	@$(CXX) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -fpermissive -std=gnu++0x -c -o "$@" "$<" $(IFLAGS)
+	@$(CXX) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -fpermissive -std=gnu++0x -c -o "$@" "$<" $(IFLAGS) $(ISYSTEMFLAGS)
 
 $(OBJPATH)%.o: %.c
 	@mkdir -p $(OBJPATH)
 	@echo 'Building C' $@
-	@$(CC) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -std=c99 -c -o "$@" "$<" $(IFLAGS)
+	@$(CC) $(CFLAGS) $(DFLAGS) $(OPTLEVEL) -ffunction-sections -fdata-sections -std=c99 -c -o "$@" "$<" $(IFLAGS) $(ISYSTEMFLAGS)
 
 $(OBJPATH)%.o: %.s
 	@mkdir -p $(OBJPATH)
 	@echo 'Building Assembly' $@
-	@$(CC) $(CFLAGS) $(DFLAGS) -x assembler-with-cpp -c -o "$@" "$<" $(IFLAGS)
+	@$(CC) $(CFLAGS) $(DFLAGS) -x assembler-with-cpp -c -o "$@" "$<" $(IFLAGS) $(ISYSTEMFLAGS)
 
 $(FILENAME).bin: $(OBJ)
 	@echo 'Building' $(FILENAME).axf
