@@ -135,23 +135,24 @@
 #define GAIN                                    AM_GAIN_MEDIUM
 #define GAIN_RANGE                              AM_NORMAL_GAIN_RANGE
 
-#define SAMPLE_RATE                             384000
+#define SAMPLE_RATE                             192000
 
 #if EI_MODEL_FREQUENCY == KHZ_16
-#define SAMPLE_RATE_DIVIDER                     24
+#define SAMPLE_RATE_DIVIDER                     12
 #endif
 #if EI_MODEL_FREQUENCY == KHZ_8
-#define SAMPLE_RATE_DIVIDER                     48
+#define SAMPLE_RATE_DIVIDER                     24
 #endif
 
 #define ACQUISITION_SAMPLES                     16
 #define OVER_SAMPLE_RATE                        1
-#define CLOCK_DIVIDER                           4
+#define STANDARD_CLOCK_DIVIDER                  4
+#define ENERGY_SAVER_CLOCK_DIVIDER              2
 
 #define ENABLE_LOW_VOLTAGE_CUTOFF               true
 #define DISABLE_48HZ_DC_BLOCKING_FILTER         false
-
-#define SHOW_GREEN_LED_DURING_COMPUTATION       true
+#define SHOW_GREEN_LED_DURING_COMPUTATION       false
+#define USE_ENERGY_SAVER_MODE                   true
 
 /* Useful macros */
 
@@ -801,6 +802,10 @@ int main(void) {
 
     }
 
+    /* Adjust the clock frequency */
+
+    if (USE_ENERGY_SAVER_MODE) AudioMoth_setClockDivider(AM_HF_CLK_DIV2);
+
     /* Read the time */
 
     uint32_t currentTime;
@@ -880,6 +885,10 @@ int main(void) {
         /* Calculate time of next recording if ready to make a recording */
 
         if (*readyToMakeRecordings) {
+
+            /* Enable energy saver mode */  
+
+            if (USE_ENERGY_SAVER_MODE) AudioMoth_setClockDivider(AM_HF_CLK_DIV2);
 
             /* Reset the error flag */
 
@@ -1024,6 +1033,10 @@ int main(void) {
     /* Make a recording */
     
     if (timeUntilPreparationStart <= 0) {
+
+        /* Enable energy saver mode */  
+
+        if (USE_ENERGY_SAVER_MODE) AudioMoth_setClockDivider(AM_HF_CLK_DIV2);
 
         /* Write configuration if not already done so */
 
@@ -1669,7 +1682,9 @@ static AM_recordingState_t makeRecording(uint32_t timeOfNextRecording, uint32_t 
 
     AudioMoth_enableExternalSRAM();
 
-    bool externalMicrophone = AudioMoth_enableMicrophone(GAIN_RANGE, GAIN, CLOCK_DIVIDER, ACQUISITION_SAMPLES, OVER_SAMPLE_RATE);
+    uint32_t clockDivider = USE_ENERGY_SAVER_MODE ? ENERGY_SAVER_CLOCK_DIVIDER : STANDARD_CLOCK_DIVIDER;
+
+    bool externalMicrophone = AudioMoth_enableMicrophone(GAIN_RANGE, GAIN, clockDivider, ACQUISITION_SAMPLES, OVER_SAMPLE_RATE);
 
     AudioMoth_initialiseDirectMemoryAccess(primaryBuffer, secondaryBuffer, numberOfRawSamplesInDMATransfer);
 
