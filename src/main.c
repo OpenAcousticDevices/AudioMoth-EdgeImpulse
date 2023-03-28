@@ -24,7 +24,7 @@
 
 #define EI_MODEL_FREQUENCY                      KHZ_16
 
-#define DETECTION_THRESHOLD                     0.8f
+#define DETECTION_THRESHOLD                     0.5f
 #define EI_SIGNAL_LENGTH                        EI_MODEL_FREQUENCY
 
 /* Useful time constants */
@@ -135,24 +135,31 @@
 #define GAIN                                    AM_GAIN_MEDIUM
 #define GAIN_RANGE                              AM_NORMAL_GAIN_RANGE
 
-#define SAMPLE_RATE                             192000
-
-#if EI_MODEL_FREQUENCY == KHZ_16
-#define SAMPLE_RATE_DIVIDER                     12
-#endif
-#if EI_MODEL_FREQUENCY == KHZ_8
-#define SAMPLE_RATE_DIVIDER                     24
-#endif
-
-#define ACQUISITION_SAMPLES                     16
-#define OVER_SAMPLE_RATE                        1
-#define STANDARD_CLOCK_DIVIDER                  4
-#define ENERGY_SAVER_CLOCK_DIVIDER              2
-
 #define ENABLE_LOW_VOLTAGE_CUTOFF               true
 #define DISABLE_48HZ_DC_BLOCKING_FILTER         false
 #define SHOW_GREEN_LED_DURING_COMPUTATION       false
 #define USE_ENERGY_SAVER_MODE                   true
+
+#if USE_ENERGY_SAVER_MODE == true
+    #define SAMPLE_RATE                         192000
+    #define CLOCK_DIVIDER                       2
+    #if EI_MODEL_FREQUENCY == KHZ_16
+        #define SAMPLE_RATE_DIVIDER             12
+    #else
+        #define SAMPLE_RATE_DIVIDER             24
+    #endif
+#else
+    #define SAMPLE_RATE                         384000
+    #define CLOCK_DIVIDER                       4
+    #if EI_MODEL_FREQUENCY == KHZ_16
+        #define SAMPLE_RATE_DIVIDER             24
+    #else
+        #define SAMPLE_RATE_DIVIDER             48
+    #endif
+#endif
+
+#define ACQUISITION_SAMPLES                     16
+#define OVER_SAMPLE_RATE                        1
 
 /* Useful macros */
 
@@ -1682,9 +1689,7 @@ static AM_recordingState_t makeRecording(uint32_t timeOfNextRecording, uint32_t 
 
     AudioMoth_enableExternalSRAM();
 
-    uint32_t clockDivider = USE_ENERGY_SAVER_MODE ? ENERGY_SAVER_CLOCK_DIVIDER : STANDARD_CLOCK_DIVIDER;
-
-    bool externalMicrophone = AudioMoth_enableMicrophone(GAIN_RANGE, GAIN, clockDivider, ACQUISITION_SAMPLES, OVER_SAMPLE_RATE);
+    bool externalMicrophone = AudioMoth_enableMicrophone(GAIN_RANGE, GAIN, CLOCK_DIVIDER, ACQUISITION_SAMPLES, OVER_SAMPLE_RATE);
 
     AudioMoth_initialiseDirectMemoryAccess(primaryBuffer, secondaryBuffer, numberOfRawSamplesInDMATransfer);
 
