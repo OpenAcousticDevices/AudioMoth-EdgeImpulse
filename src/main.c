@@ -24,7 +24,7 @@
 
 #define EI_MODEL_FREQUENCY                      KHZ_16
 
-#define DETECTION_THRESHOLD                     0.5f
+#define DETECTION_THRESHOLD                     0.35f
 #define EI_SIGNAL_LENGTH                        EI_MODEL_FREQUENCY
 
 /* Useful time constants */
@@ -809,10 +809,6 @@ int main(void) {
 
     }
 
-    /* Adjust the clock frequency */
-
-    if (USE_ENERGY_SAVER_MODE) AudioMoth_setClockDivider(AM_HF_CLK_DIV2);
-
     /* Read the time */
 
     uint32_t currentTime;
@@ -893,10 +889,6 @@ int main(void) {
 
         if (*readyToMakeRecordings) {
 
-            /* Enable energy saver mode */  
-
-            if (USE_ENERGY_SAVER_MODE) AudioMoth_setClockDivider(AM_HF_CLK_DIV2);
-
             /* Reset the error flag */
 
             *recordingErrorHasOccurred = false;
@@ -952,6 +944,10 @@ int main(void) {
                 *timeOfNextGPSTimeSetting = UINT32_MAX;
 
             }
+
+            /* Power down to a fresh state */
+
+            SAVE_SWITCH_POSITION_AND_POWER_DOWN(SHORT_WAIT_INTERVAL);
 
         }
 
