@@ -24,7 +24,7 @@
 
 #define EI_MODEL_FREQUENCY                      KHZ_16
 
-#define DETECTION_THRESHOLD                     0.5f
+#define DETECTION_THRESHOLD                     0.35f
 #define EI_SIGNAL_LENGTH                        EI_MODEL_FREQUENCY
 
 /* Useful time constants */
