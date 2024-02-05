@@ -1,8 +1,6 @@
 # AudioMoth-Edge Impulse
 A modified version of the [AudioMoth standard firmware](https://github.com/OpenAcousticDevices/AudioMoth-Project). This software performs live classification of samples using a neural network from [Edge Impulse](https://edgeimpulse.com/) and saves audio clips containing a specific sound.
 
-For more details, visit [AudioMoth Labs](https://www.openacousticdevices.info/labs).
-
 ### Usage ###
 
 Clone the contents of [AudioMoth-Project](https://github.com/OpenAcousticDevices/AudioMoth-Project).
